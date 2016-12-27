@@ -1,0 +1,32 @@
+/* Bootstrap Overrides */
+body {
+    background-color: #0D639A;
+}
+.navbar, label, .navbar a {
+    color: white;
+    font-weight: normal;
+}
+.navbar {
+    border-bottom: 1px solid #2788C4;
+    margin-bottom: 10px;
+}
+li.active a, li a:hover.bs-overrides {
+    background-color: white;
+    color: #0D639A;
+}
+li.active a {
+    font-size: larger;
+    font-weight: bolder;
+}
+/* End of Bootstrap Overrides */
+
+/* Main styles */
+.chartcontainer {
+    height: 100%; /* Will be bypassed through javascript code. */
+}
+.chartcontainer div {
+    height: 100%;
+}
+.spacer {
+    height: 10px;
+}
