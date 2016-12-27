@@ -18,3 +18,12 @@ Frameworks and libraries used for development:
 * Highcharts 4.1.5
 * jQuery 1.11.2
 * CodeIgniter 2.2.2
+
+## Screenshots
+**Project Dashboard**: shows (left chart) the work/time progress of ongoing tasks per project and (right chart) the amount of projects per project type.
+
+![Projects](/backup/screenshot-projects.png?raw=true "Project Dashboard")
+
+**Employee Dashboard**: shows (left chart) the work/time progress of ongoing tasks per employee and (right chart) the amount of ongoing tasks per employee separated by progress.
+
+![Employees](/backup/screenshot-employees.png?raw=true "Employee Dashboard")
