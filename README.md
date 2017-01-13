@@ -15,7 +15,7 @@ Follow these steps to setup qdashboard:
 Frameworks and libraries used for development:
 
 * qdPM (of course) 8.3
-* Highcharts 4.1.5
+* Highcharts 5.0.6
 * jQuery 1.11.2
 * CodeIgniter 2.2.2
 
