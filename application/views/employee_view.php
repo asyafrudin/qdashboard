@@ -3,7 +3,7 @@
             <div id="chart-filter" class="col-md-12">
                 <form class="form-inline">
                     <div class="form-group">
-                        <label>Employee Groups</label>
+                        <label>Group</label>
                         <select class="form-control input-sm" id="employee-group">
                         <?php foreach ($employee_groups as $employee_group) {
                             echo '<option value="'.$employee_group['id'].'">'.$employee_group['name'].'</option>';

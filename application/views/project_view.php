@@ -3,10 +3,16 @@
             <div id="chart-filter" class="col-md-12">
                 <form class="form-inline">
                     <div class="form-group">
-                        <label>Project Types</label>
+                        <label>Type</label>
                         <select class="form-control input-sm" id="project-type">
                         <?php foreach ($project_types as $project_type) {
                             echo '<option value="'.$project_type['id'].'">'.$project_type['name'].'</option>';
+                        }?>
+                        </select>
+                        <label>Year</label>
+                        <select class="form-control input-sm" id="project-year">
+                        <?php for ($i = date("Y"); $i >= 2015; $i--) {
+                            echo '<option value="'.$i.'">'.$i.'</option>';
                         }?>
                         </select>
                     </div>

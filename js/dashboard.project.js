@@ -28,26 +28,24 @@ $(document).ready(function() {
 
     // Load chart for the first time
     var selectedProjectType = $('#project-type').val(); // Get selected project type
-    refreshChart(selectedProjectType);
+    var selectedProjectYear = $('#project-year').val(); // Get selected project year
+    refreshChart(selectedProjectType, selectedProjectYear);
 
     // Submit event handler for filter
     $('#chart-filter form').submit(function(e) {
         e.preventDefault();
         selectedProjectType = $('#project-type').val();
-        refreshChart(selectedProjectType);
+        selectedProjectYear = $('#project-year').val();
+        refreshChart(selectedProjectType, selectedProjectYear);
     });
 
     // Function to load or refresh charts
-    function refreshChart(projectType) {
+    function refreshChart(projectType, projectYear) {
         var ontrackProject = 0; // Number of On Track projects
         var delayedProject = 0; // Number of Delayed projects
         var overdueProject = 0; // Number of Overdue projects
 
-        $.getJSON(baseUrl + 'index.php/project/get_ongoing_status/' + projectType, function(json) {
-            if (json.length == 0) {
-                alert('No projects available!');
-                return false;
-            }
+        $.getJSON(baseUrl + 'index.php/project/get_ongoing_status/' + projectType + '/' + projectYear, function(json) {
             var projectData = [];
             var projectColors = []; // Status colors for each project
             $.each(json, function(key, value) {
@@ -122,13 +120,23 @@ $(document).ready(function() {
                             'Work/Time Score: ' + this.point.y;
                     }
                 },
+                lang: {
+                    noData: "No data to display!"
+                },
+                noData: {
+                    style: {
+                        fontWeight: 'bold',
+                        fontSize: '15px',
+                        color: '#303030'
+                    }
+                },
                 series: [{
                     name: 'Ongoing Project Status',
                     data: projectData
                 }],
             });
 
-            $.getJSON(baseUrl + 'index.php/project/get_population/' + projectType, function(json) {
+            $.getJSON(baseUrl + 'index.php/project/get_population/' + projectType + '/' + projectYear, function(json) {
                 var closedProject = 
                     (typeof json['Closed'] != "undefined") ? json['Closed']['total'] : 0; // Number of closed projects
                 var closedProjectStatusID = 
@@ -196,31 +204,7 @@ $(document).ready(function() {
                                     if (this.y == 0 ) return ''; // Don't show dataLabel if value is 0
                                     return Math.abs(this.y);
                                 }
-                            },
-                            point: { // Added click handler for each bar/column in series
-                                events: {
-                                    click: function() {
-                                        if (this.myStatusID > 0)
-                                            window.open(qdpmUrl + 'index.php/projects?filter_by[ProjectsStatus]=' + this.myStatusID +
-                                                '&filter_by[ProjectsTypes]=' + $('#project-type').val(), 
-                                                '_blank');
-                                    }
-                                }
                             }
-                        }
-                    },
-                    tooltip: {
-                        useHTML: true,
-                        formatter: function() { // Added link to open list of projects based on project status and project type
-                            var tooltipText = '<b>' + this.series.name + ' ' + this.point.category + '</b>: ';
-                            if (this.point.myStatusID > 0) {
-                                tooltipText = '<a href="' + qdpmUrl + 'index.php/projects?filter_by[ProjectsStatus]=' + this.point.myStatusID + 
-                                    '&filter_by[ProjectsTypes]=' + $('#project-type').val() +
-                                    '" target="_blank">' + tooltipText +
-                                    '<span class="glyphicon glyphicon-new-window" aria-hidden="true"></span></a>:';
-                            }
-                            tooltipText += Highcharts.numberFormat(Math.abs(this.point.y), 0);
-                            return  tooltipText;
                         }
                     },
                     series: [{
@@ -239,16 +223,13 @@ $(document).ready(function() {
                         name: 'Cancelled',
                         data: [{y: cancelledProject, myStatusID: cancelledProjectStatusID}],
                         color: chartColors['cancelled'],
-                        cursor: 'pointer'
                     }, {
                         name: 'On Hold',
                         data: [{y: onholdProject, myStatusID: onholdProjectStatusID}],
                         color: chartColors['onhold'],
-                        cursor: 'pointer'
                     }, {
                         name: 'Closed',
                         data: [{y: closedProject, myStatusID: closedProjectStatusID}],
-                        cursor: 'pointer'
                     }]
                 });
             });

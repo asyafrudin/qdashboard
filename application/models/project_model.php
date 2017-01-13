@@ -7,7 +7,7 @@ class Project_model extends CI_Model
         parent::__construct();
     }
 
-    function get_ongoing_status($project_type)
+    function get_ongoing_status($project_type, $project_year)
     {
         $this->load->database();
 
@@ -18,13 +18,21 @@ class Project_model extends CI_Model
             $project_type_filter = ' and p.projects_types_id = '.$this->db->escape($project_type);
         }
 
+        // Set project year
+        $project_year_filter = '';
+        if ($project_year > 0)
+        {
+            $project_year_filter = ' having year(max(t.due_date)) = '.$this->db->escape($project_year);
+        }
+
         $query = $this->db->query(
             'select p.id, p.name, ifnull(ceiling(sum(t.progress) / count(t.id)), 0) as work_progress, 
                 ifnull(ceiling((current_date - min(t.start_date)) / (max(t.due_date) - min(t.start_date)) * 100), 0) as time_progress 
             from tasks t right join projects p on t.projects_id = p.id 
-            where p.projects_status_id = 1 and t.tasks_status_id = 1'.$project_type_filter.' '.
-            'group by p.id
-            order by p.name'
+            where p.projects_status_id = 1 and t.tasks_status_id = 1'.$project_type_filter.
+            ' group by p.id'.
+            $project_year_filter.
+            ' order by p.name'
             );
         $result = $query->result_array();
 
@@ -71,7 +79,7 @@ class Project_model extends CI_Model
         return $preprocessed;
     }
 
-    function get_population($project_type)
+    function get_population($project_type, $project_year)
     {
         $this->load->database();
 
@@ -79,14 +87,21 @@ class Project_model extends CI_Model
         $project_type_filter = '';
         if ($project_type > 0)
         {
-            $project_type_filter = 'where p.projects_types_id = '.$this->db->escape($project_type);
+            $project_type_filter = ' where p.projects_types_id = '.$this->db->escape($project_type);
+        }
+
+        // Set project year
+        $project_year_filter = '';
+        if ($project_year > 0)
+        {
+            $project_year_filter = ' where z.year = '.$this->db->escape($project_year);
         }
 
         $query = $this->db->query(
-            'select s.id, s.name, count(s.name) as total
-            from projects p inner join projects_status s on p.projects_status_id = s.id '
-            .$project_type_filter.' '.
-            'group by s.name'
+            'select z.id, z.name, count(z.name) as total 
+            from (select s.id, s.name, p.name as project_name, coalesce(year(max(t.due_date)), year(p.created_at)) as year from projects p inner join projects_status s on p.projects_status_id = s.id left join tasks t on p.id = t.projects_id'.$project_type_filter.' group by p.id) z '.
+            $project_year_filter.
+            ' group by z.name'
             );
         $result = $query->result_array();
 

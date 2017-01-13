@@ -25,6 +25,7 @@
     <script src="<?php echo base_url('js/jquery.min.js') ?>"></script>
     <script src="<?php echo base_url('js/bootstrap.min.js') ?>"></script>
     <script src="<?php echo base_url('js/highcharts.js') ?>"></script>
+    <script src="<?php echo base_url('js/no-data-to-display.js') ?>"></script>
     <script src="<?php echo base_url('js/'.$page_script) ?>"></script>
     <script type="text/javascript">
         var qdpmUrl = '<?php echo $qdpm_url; ?>';
