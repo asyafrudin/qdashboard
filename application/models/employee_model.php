@@ -20,9 +20,9 @@ class Employee_model extends CI_Model
 
         $query = $this->db->query(
             'select *
-            from (select u.id, u.name, ifnull(ceiling(sum(t.progress) / count(t.id)), 0) as work_progress, ifnull(ceiling((current_date - min(t.start_date)) / (max(t.due_date) - min(t.start_date)) * 100), 0) as time_progress from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.' group by u.id
-            union
-            select u.id, u.name, 0, 0 from users u where u.id not in (select u.id from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.')'.$employee_group_filter.') users_tasks_progress 
+            from (select u.id, u.name, ifnull(ceiling(sum(t.progress) / count(t.id)), 0) as work_progress, ifnull(ceiling((current_date - min(t.start_date)) / (max(t.due_date) - min(t.start_date)) * 100), 0) as time_progress from users u, tasks t where u.active is not null and t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.' group by u.id
+                union
+                select u.id, u.name, 0, 0 from users u where u.active is not null and u.id not in (select u.id from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.')'.$employee_group_filter.') users_tasks_progress 
             order by name'
             );
         $result = $query->result_array();
@@ -72,8 +72,9 @@ class Employee_model extends CI_Model
 
         $query = $this->db->query(
             'select *
-            from (select u.id as user_id, u.name as user_name, t.id as task_id, t.name as task_name, ifnull(t.progress, 0) as task_progress from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.' 
-            union select u.id, u.name, 0, "", 0 from users u where u.id not in (select u.id from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.')'.$employee_group_filter.') users_tasks
+            from (select u.id as user_id, u.name as user_name, t.id as task_id, t.name as task_name, ifnull(t.progress, 0) as task_progress from users u, tasks t where u.active is not null and t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.' 
+                union 
+                select u.id, u.name, 0, "", 0 from users u where u.active is not null and u.id not in (select u.id from users u, tasks t where t.tasks_status_id = 1 and find_in_set(u.id, t.assigned_to) > 0'.$employee_group_filter.')'.$employee_group_filter.') users_tasks
             order by user_name'
             );
         $result = $query->result_array();
@@ -88,7 +89,8 @@ class Employee_model extends CI_Model
         $query = $this->db->query(
             'select id, name 
             from users_groups g
-            where allow_manage_users is null and allow_manage_configuration is null
+            where (allow_manage_users is null and allow_manage_configuration is null)
+                and lower(name) not like "%default%"
             order by g.name asc'
             );
         $result = $query->result_array();
